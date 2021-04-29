@@ -11,5 +11,7 @@ target 'LoginPages' do
 	pod 'ObjectMapper', '~> 3.3'
 	pod 'Kingfisher', '~> 4.0'
 	pod 'FSPagerView'
+	pod 'RxRealm'
+	pod 'RealmSwift'
 
 end
