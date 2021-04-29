@@ -11,7 +11,9 @@ class RootNavigationController: UINavigationController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        if let controller = storyboard?.instantiateViewController(withIdentifier: "StartViewController") as? StartViewController{
+            navigationController?.pushViewController(controller, animated: true)
+        }
         // Do any additional setup after loading the view.
     }
     

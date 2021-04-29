@@ -7,13 +7,30 @@
 
 import UIKit
 
-class StartViewController: UIViewController {
+class StartViewController: BaseViewController {
+    
+    
+    @IBOutlet weak var loginButton: UIButton!
+    @IBOutlet weak var signInButton: UIButton!
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
     }
+    
+    @IBAction func loginClicked(_ sender: Any) {
+        if let controller = storyboard?.instantiateViewController(withIdentifier: "LoginViewController") as? LoginViewController{
+            navigationController?.pushViewController(controller, animated: true)
+        }
+    }
+    
+    @IBAction func signInClicked(_ sender: Any) {
+        if let controller = storyboard?.instantiateViewController(withIdentifier: "RegisterViewController") as? RegisterViewController{
+            navigationController?.pushViewController(controller, animated: true)
+        }
+    }
+    
     
 
     /*
