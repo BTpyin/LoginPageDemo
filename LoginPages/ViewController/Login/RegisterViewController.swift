@@ -8,15 +8,19 @@
 import UIKit
 import RxSwift
 import RxRealm
-import Realm
 import RealmSwift
 import RxCocoa
+import FirebaseFirestore
+import FirebaseAuth
+
 
 class RegisterViewController: BaseViewController, UITextFieldDelegate {
 
+    var db: Firestore!
     var disposeBag = DisposeBag()
     var viewModel : RegisterViewModel?
     
+    @IBOutlet weak var scrollView: UIScrollView!
     @IBOutlet weak var memberIdTextField: UITextField!
     @IBOutlet weak var emailTextField: UITextField!
     @IBOutlet weak var nameTextField: UITextField!
@@ -35,6 +39,9 @@ class RegisterViewController: BaseViewController, UITextFieldDelegate {
         emailTextField.delegate = self
         passwordTextField.delegate = self
         reEnterTextField.delegate = self
+        db = Firestore.firestore()
+        let scrollViewTap = UITapGestureRecognizer(target: self, action: #selector(scrollViewTapped))
+        scrollView.addGestureRecognizer(scrollViewTap)
         configureUI()
 
         memberIdTextField.rx.text.orEmpty.asObservable()
@@ -130,7 +137,30 @@ class RegisterViewController: BaseViewController, UITextFieldDelegate {
         viewModel?.phoneInput.accept(phoneTextField.text)
         
         //create user
-        
+        Auth.auth().createUser(withEmail: (viewModel?.emailInput.value)!, password: (viewModel?.reInputPassword.value)!){ [self] (user, error) in
+                    if error == nil {
+                        self.navigationController?.popViewController(animated: true)
+                        db.collection("users").addDocument(data: [
+                            "memberName": viewModel?.nameInput.value!,
+                            "memId": viewModel?.memIdInput.value!,
+                            "email": viewModel?.emailInput.value!,
+                            "phone": viewModel?.phoneInput.value!,
+                            "uid": user?.user.uid
+                        ]) { (error) in
+                            if let error = error {
+                                self.showAlert(error.localizedDescription)
+                                print(error)
+                            }
+                        }
+
+                    }
+                    else{
+                        self.showAlert(error?.localizedDescription)
+                        print(error)
+                    }
+
+                }
+
         
     }
 
@@ -149,11 +179,18 @@ class RegisterViewController: BaseViewController, UITextFieldDelegate {
         return true
     }
     
+    @objc func scrollViewTapped() {
+//        print("scrollViewTapped")
+            view.endEditing(true)
+    }
+    
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         view.endEditing(true)
     }
 
 }
+
+
 class RegisterViewModel{
     var memIdInput = BehaviorRelay<String?>(value: nil)
     var passwordInput = BehaviorRelay<String?>(value: nil)

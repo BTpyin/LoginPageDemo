@@ -11,7 +11,11 @@ target 'LoginPages' do
 	pod 'ObjectMapper', '~> 3.3'
 	pod 'Kingfisher', '~> 4.0'
 	pod 'FSPagerView'
+	pod 'ImageSlideshow', '~> 1.9.0'
 	pod 'RxRealm'
 	pod 'RealmSwift'
+	pod ‘Firebase/Auth’
+	pod 'Firebase/Firestore'
+	pod 'Firebase/Core'
 
 end

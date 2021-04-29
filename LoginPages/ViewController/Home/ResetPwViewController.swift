@@ -9,8 +9,9 @@ import UIKit
 import RxCocoa
 import RxSwift
 import RxRealm
-import Realm
 import RealmSwift
+import FirebaseAuth
+import Firebase
 
 class ResetPwViewController: BaseViewController, UITextFieldDelegate {
     
@@ -71,6 +72,43 @@ class ResetPwViewController: BaseViewController, UITextFieldDelegate {
         self.resetButton.setTitleColor(UIColor.init(red: 255, green: 189, blue: 43), for: .normal)
         self.resetButton.setTitleColor(UIColor.init(red: 128, green: 128, blue: 128), for: .disabled)
         self.buttonLine.backgroundColor = UIColor.init(red: 128, green: 128, blue: 128)
+    }
+    
+    @IBAction func resetClicked(_ sender: Any) {
+        resetPw()
+    }
+    
+    func resetPw(){
+        var autherror = true
+        Auth.auth().currentUser?.updatePassword(to: (viewModel?.passwordInput.value)!){ error in
+            if error == nil {
+                autherror = false
+            }else {
+                self.showAlert(error?.localizedDescription)
+                autherror = true
+            }
+        }
+        Auth.auth().sendPasswordReset(withEmail: (Auth.auth().currentUser?.email)!){error in
+            if error == nil {
+                autherror = false
+            }else {
+                self.showAlert(error?.localizedDescription)
+                autherror = true
+            }
+        }
+
+//            do {
+//                try Auth.auth().signOut()
+//            }
+//                 catch let signOutError as NSError {
+//                        print ("Error signing out: %@", signOutError)
+//            }
+        
+            self.navigationController?.popToRootViewController(animated: true)
+            let storyboard = UIStoryboard(name: "Main", bundle: nil)
+            let initial = storyboard.instantiateInitialViewController()
+                UIApplication.shared.keyWindow?.rootViewController = initial
+
     }
     
     

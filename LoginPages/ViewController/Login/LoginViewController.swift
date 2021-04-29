@@ -12,12 +12,15 @@ import RxRealm
 import Realm
 import RealmSwift
 import RxCocoa
+import FirebaseAuth
+import ImageSlideshow
 
-class LoginViewController: UIViewController, UITextFieldDelegate {
+class LoginViewController: BaseViewController, UITextFieldDelegate {
     
     var disposeBag = DisposeBag()
     var viewModel : LoginViewModel?
 
+    @IBOutlet weak var slideShow: ImageSlideshow!
     @IBOutlet weak var emailTextField: UITextField!
     @IBOutlet weak var passwordTextField: UITextField!
     @IBOutlet weak var memberIdTextField: UITextField!
@@ -32,7 +35,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
         emailTextField.delegate = self
         passwordTextField.delegate = self
         configureUI()
-
+        slideShowSetup()
         
         memberIdTextField.rx.text.orEmpty.asObservable()
             .subscribe(onNext: { [self]_ in
@@ -71,6 +74,22 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
           }).disposed(by: disposeBag)
     }
     
+    func slideShowSetup(){
+        let pageIndicator = UIPageControl()
+        pageIndicator.currentPageIndicatorTintColor = UIColor.white
+        pageIndicator.pageIndicatorTintColor = UIColor.lightGray
+        slideShow.pageIndicator = pageIndicator
+        slideShow.contentScaleMode = .scaleAspectFill
+        slideShow.pageIndicatorPosition = PageIndicatorPosition(horizontal: .center, vertical: .bottom)
+        slideShow.activityIndicator = DefaultActivityIndicator(style: .white, color: nil)
+        slideShow.setImageInputs([
+            ImageSource(image: UIImage(named: "testImage1")!),
+            ImageSource(image: UIImage(named: "testImage2")!),
+            ImageSource(image: UIImage(named: "testImage3")!),
+            ImageSource(image: UIImage(named: "testImage4")!)
+        ])
+    }
+    
     func configureUI(){
         memberIdTextField.textColor = UIColor.init(red: 96,green: 96,blue: 96)
         memberIdTextField.borderColor = UIColor.init(red: 168,green: 168,blue: 168)
@@ -85,6 +104,17 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
     }
     
     @IBAction func loginClicked(_ sender: Any) {
+        Auth.auth().signIn(withEmail: (viewModel?.emailInput.value)!, password: (viewModel?.passwordInput.value)!) { (user, error) in
+            if error == nil {
+                let storyboard = UIStoryboard(name: "Main", bundle: nil)
+                let initial = storyboard.instantiateInitialViewController()
+                UIApplication.shared.keyWindow?.rootViewController = initial
+            }
+            else {
+
+                self.showAlert(error?.localizedDescription)
+            }
+        }
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {

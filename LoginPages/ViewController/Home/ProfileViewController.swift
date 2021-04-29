@@ -14,6 +14,7 @@ import RealmSwift
 class ProfileViewController: UIViewController {
     
     var viewModel: ProfileViewModel?
+    var disposeBag = DisposeBag()
     
     @IBOutlet weak var profileView: UIView!
     @IBOutlet weak var iconImageView: UIImageView!
@@ -26,8 +27,14 @@ class ProfileViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         viewModel = ProfileViewModel()
-//        uiBind(member: (viewModel?.member?.first)!)
-        uiBind(member: Member().demoMember())
+
+//        uiBind(member: Member().demoMember())
+        
+        Observable.changeset(from: ((viewModel?.member)!)).subscribe(onNext: { [self] results in
+            
+            uiBind(member: (viewModel?.member?[0]) ?? Member().demoMember())
+        }).disposed(by: disposeBag)
+        
         // Do any additional setup after loading the view.
     }
     
@@ -51,15 +58,12 @@ class ProfileViewController: UIViewController {
         emailTextField.text = member.email
         phoneTextField.text = member.phone
         
-        
-        
-        
-        
     }
 
 }
 class ProfileViewModel{
     var member: Results<Member>?
+    
     init(){
         member = try? Realm().objects(Member.self)
     }
