@@ -45,8 +45,8 @@ class HomeViewController: BaseViewController, UITableViewDataSource, UITableView
             let controller = UIAlertController(title: "Confirm Logout?", message: "All Data that stored in local will be removed and will not be Recovered.", preferredStyle: .alert)
             let okAction = UIAlertAction(title: "OK", style: .default) { (_) in
                 self.logout()
-
             }
+            
             controller.addAction(okAction)
             let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
             controller.addAction(cancelAction)
@@ -65,6 +65,11 @@ class HomeViewController: BaseViewController, UITableViewDataSource, UITableView
             present(controller, animated: true, completion: nil)
             
             
+        }else if(indexPath.row == 3){
+            UserDefaults.standard.set("", forKey:"memID")
+            UserDefaults.standard.set("", forKey:"userEmail")
+            UserDefaults.standard.set("", forKey:"password")
+            showAlert("Done")
         }
     }
     
@@ -104,7 +109,7 @@ class HomeViewController: BaseViewController, UITableViewDataSource, UITableView
 
 class HomeViewModel{
     
-    var settingContentList = ["Profile","Logout","Reset Password"]
+    var settingContentList = ["Profile","Logout","Reset Password","Remove Saved Login Info."]
     
     func getUser(completed: ((SyncDataFailReason?) -> Void)?){
       SyncData().syncUser(completed: completed)

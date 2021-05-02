@@ -93,10 +93,13 @@ class LoginViewController: BaseViewController, UITextFieldDelegate {
     func configureUI(){
         memberIdTextField.textColor = UIColor.init(red: 96,green: 96,blue: 96)
         memberIdTextField.borderColor = UIColor.init(red: 168,green: 168,blue: 168)
+        memberIdTextField.text = (UserDefaults.standard.string(forKey: "memID") ?? "")
         emailTextField.textColor = UIColor.init(red: 96,green: 96,blue: 96)
         emailTextField.borderColor = UIColor.init(red: 168,green: 168,blue: 168)
+        emailTextField.text = (UserDefaults.standard.string(forKey: "userEmail") ?? "")
         passwordTextField.textColor = UIColor.init(red: 96,green: 96,blue: 96)
         passwordTextField.borderColor = UIColor.init(red: 168,green: 168,blue: 168)
+        passwordTextField.text = (UserDefaults.standard.string(forKey: "password") ?? "")
 
         self.loginButton.setTitleColor(UIColor.init(red: 255, green: 189, blue: 43), for: .normal)
         self.loginButton.setTitleColor(UIColor.init(red: 128, green: 128, blue: 128), for: .disabled)
@@ -106,13 +109,36 @@ class LoginViewController: BaseViewController, UITextFieldDelegate {
     @IBAction func loginClicked(_ sender: Any) {
         Auth.auth().signIn(withEmail: (viewModel?.emailInput.value)!, password: (viewModel?.passwordInput.value)!) { (user, error) in
             if error == nil {
-                let storyboard = UIStoryboard(name: "Main", bundle: nil)
-                let initial = storyboard.instantiateInitialViewController()
-                UIApplication.shared.keyWindow?.rootViewController = initial
+                
+                
+                let actionSheet = UIAlertController(title: "Save Password?", message: nil, preferredStyle: .actionSheet)
+                let saveAction = UIAlertAction(title: "Save Password", style: .default){
+                    action in
+                    UserDefaults.standard.set((self.viewModel?.memIDInput.value)!, forKey:"memID")
+                    UserDefaults.standard.set((self.viewModel?.emailInput.value)!, forKey:"userEmail")
+                    UserDefaults.standard.set((self.viewModel?.passwordInput.value)!, forKey:"password")
+                    let storyboard = UIStoryboard(name: "Main", bundle: nil)
+                    let initial = storyboard.instantiateInitialViewController()
+                    UIApplication.shared.keyWindow?.rootViewController = initial
+                }
+                
+                let cancelAction = UIAlertAction(title: "Cancel", style: .cancel){
+                    action in
+                    let storyboard = UIStoryboard(name: "Main", bundle: nil)
+                    let initial = storyboard.instantiateInitialViewController()
+                    UIApplication.shared.keyWindow?.rootViewController = initial
+                }
+                actionSheet.addAction(saveAction)
+                actionSheet.addAction(cancelAction)
+                self.present(actionSheet, animated:true)
+
             }
             else {
 
                 self.showAlert(error?.localizedDescription)
+                let storyboard = UIStoryboard(name: "Main", bundle: nil)
+                let initial = storyboard.instantiateInitialViewController()
+                UIApplication.shared.keyWindow?.rootViewController = initial
             }
         }
     }

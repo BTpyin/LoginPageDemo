@@ -82,7 +82,32 @@ class ResetPwViewController: BaseViewController, UITextFieldDelegate {
         var autherror = true
         Auth.auth().currentUser?.updatePassword(to: (viewModel?.passwordInput.value)!){ error in
             if error == nil {
+                
                 autherror = false
+                
+                
+                let actionSheet = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+                let saveAction = UIAlertAction(title: "Save Password", style: .default){
+                    action in
+                    UserDefaults.standard.set((self.viewModel?.passwordInput.value)!, forKey:"password")
+                    self.navigationController?.popToRootViewController(animated: true)
+                    let storyboard = UIStoryboard(name: "Main", bundle: nil)
+                    let initial = storyboard.instantiateInitialViewController()
+                        UIApplication.shared.keyWindow?.rootViewController = initial
+
+                }
+                let cancelAction = UIAlertAction(title: "Cancel", style: .cancel){
+                    action in
+                    UserDefaults.standard.set("", forKey:"password")
+                    self.navigationController?.popToRootViewController(animated: true)
+                    let storyboard = UIStoryboard(name: "Main", bundle: nil)
+                    let initial = storyboard.instantiateInitialViewController()
+                        UIApplication.shared.keyWindow?.rootViewController = initial
+
+                }
+                actionSheet.addAction(saveAction)
+                actionSheet.addAction(cancelAction)
+                self.present(actionSheet, animated:true, completion: nil)
             }else {
                 self.showAlert(error?.localizedDescription)
                 autherror = true
@@ -104,11 +129,7 @@ class ResetPwViewController: BaseViewController, UITextFieldDelegate {
 //                        print ("Error signing out: %@", signOutError)
 //            }
         
-            self.navigationController?.popToRootViewController(animated: true)
-            let storyboard = UIStoryboard(name: "Main", bundle: nil)
-            let initial = storyboard.instantiateInitialViewController()
-                UIApplication.shared.keyWindow?.rootViewController = initial
-
+ 
     }
     
     
